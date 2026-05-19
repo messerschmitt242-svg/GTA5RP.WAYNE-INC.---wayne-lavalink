@@ -1,6 +1,8 @@
 server:
-  port: ${PORT}
+  port: ${PORT:2333}
   address: 0.0.0.0
+  http2:
+    enabled: false
 
 lavalink:
   plugins:
@@ -8,7 +10,7 @@ lavalink:
       snapshot: false
 
   server:
-    password: "${LAVALINK_PASSWORD:youshallnotpass}"
+    password: "${LAVALINK_PASSWORD:${LAVALINK_SERVER_PASSWORD:youshallnotpass}}"
     sources:
       youtube: false
       bandcamp: true
@@ -30,10 +32,13 @@ lavalink:
       channelMix: true
       lowPass: true
 
-    bufferDurationMs: 400
+    # More stable on Railway/small containers.
+    bufferDurationMs: 600
     frameBufferDurationMs: 5000
     opusEncodingQuality: 10
     resamplingQuality: LOW
+    trackStuckThresholdMs: 10000
+    useSeekGhosting: true
 
 plugins:
   youtube:
@@ -41,15 +46,21 @@ plugins:
     allowSearch: true
     allowDirectVideoIds: true
     allowDirectPlaylistIds: true
+    # Correct client names for youtube-source. M_WEB is important; MWEB is not.
     clients:
-      - MUSIC
+      - M_WEB
       - WEB
-      - MWEB
-      - ANDROID_VR
+      - MUSIC
       - WEBEMBEDDED
+      - ANDROID_VR
+      - TV
+      - TVHTML5EMBEDDED
+    oauth:
+      enabled: false
 
 logging:
   level:
     root: INFO
     lavalink: INFO
     dev.lavalink.youtube: INFO
+    com.sedmelluq.discord.lavaplayer: INFO
